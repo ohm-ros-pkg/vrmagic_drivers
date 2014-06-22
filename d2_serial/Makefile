@@ -34,10 +34,10 @@ DEL_FILE = rm -f
 ####### Files
 
 OBJECTS = initcamera.o \
-		readcamera.o \
-		main.o \
-                sdlwindow.o
-TARGET   = d2_node
+		  readcamera.o \
+		  main.o \
+          sdlwindow.o
+TARGET   = d2_serial_node
 
 first: all
 ####### Implicit rules

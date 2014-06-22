@@ -21,19 +21,12 @@ enum OBJECT_MODE  { OBJECT_TEACH , OBJECT_SEARCH, OBJECT_INSPECT_TEMPLATE};
 
 #include "ros.h"
 #include <std_msgs/String.h>
+#include <sensor_msgs/Image.h>
 
-ros::NodeHandle  nh;
-std_msgs::String str_msg;
-ros::Publisher chatter("chatter", &str_msg);
-
-char *rosSrvrIp = "192.168.1.31";
-char hello[13] = "Hello ROS!";
+char *rosSrvrIp = "192.168.1.30";
 
 void readCamera(VRmUsbCamDevice device, VRmDWORD port, VRmImageFormat target_format, VRmRectI src_cropping_region)
 {
-        nh.initNode(rosSrvrIp);
-        nh.advertise(chatter);
-
 	// create gray images to use in vm_lib
 	VRmImage* p_gray_src_img=0;
 	VRmImage* p_gray_dst_img=0;
@@ -42,6 +35,30 @@ void readCamera(VRmUsbCamDevice device, VRmDWORD port, VRmImageFormat target_for
 	// actual allocation, use VRmUsbCamFreeImage to free images allocated with VRmUsbCam Lib
 	VRMEXECANDCHECK(VRmUsbCamNewImage(&p_gray_src_img, gray_format));
 	VRMEXECANDCHECK(VRmUsbCamNewImage(&p_gray_dst_img, gray_format));
+
+
+	// ROS
+	ros::NodeHandle  nh;
+	sensor_msgs::Image ros_image;
+	ros_image.height       = p_gray_src_img->m_image_format.m_height;
+	ros_image.width        = p_gray_src_img->m_image_format.m_width;
+	ros_image.step         = ros_image.width;
+	int bytes = ros_image.height*ros_image.step;
+
+	int packet_size = 128;
+	ros_image.data_length = packet_size;
+	//ros_image.st_data = bytes;
+	unsigned char* buf = new unsigned char[bytes];
+	ros_image.data = new unsigned char[packet_size];
+
+	ros::Publisher pub("image", &ros_image);
+
+    nh.initNode(rosSrvrIp);
+    nh.advertise(pub);
+
+    int seq = 0;
+
+
 
 	VD_IMAGE   in_image;     /* declare VM_Lib image structures, wrap around VRmImage */
 	in_image.st     = (long)((const unsigned char*)p_gray_src_img->mp_buffer);
@@ -55,15 +72,15 @@ void readCamera(VRmUsbCamDevice device, VRmDWORD port, VRmImageFormat target_for
 	out_image.dy     = p_gray_dst_img->m_image_format.m_height;
 	out_image.pitch  = p_gray_dst_img->m_pitch;
 
-	VD_IMAGE   template_image;  // this buffer will be allocated later
-	template_image.st=0;
+	//VD_IMAGE   template_image;  // this buffer will be allocated later
+	//template_image.st=0;
 
 	//the ROI of the pattern we want to learn
-	VRmRectI template_roi;
+	/*VRmRectI template_roi;
 	template_roi.m_left=min((gray_format.m_width/3) & ~7, 240);
 	template_roi.m_top=min((gray_format.m_height/3) & ~7, 240);
 	template_roi.m_width= 64;
-	template_roi.m_height=64;
+	template_roi.m_height=64;*/
 
 	OR_HND     or_hnd;                  /* handle object recognition */
 
@@ -86,10 +103,6 @@ void readCamera(VRmUsbCamDevice device, VRmDWORD port, VRmImageFormat target_for
 	// and enter the loop
 	do
 	{
-                str_msg.data = hello;
-                chatter.publish( &str_msg );
-                nh.spinOnce();
-
 		// lock next (raw) image for read access, convert it to the desired
 		// format and unlock it again, so that grabbing can
 		// go on
@@ -123,7 +136,16 @@ void readCamera(VRmUsbCamDevice device, VRmDWORD port, VRmImageFormat target_for
 			//convert source image into gray image for further processing with VM_LIB
 			VRMEXECANDCHECK(VRmUsbCamConvertImage(p_cropped_src_img, p_gray_src_img));
 
-			switch(mode)
+			//ros_image.header.stamp = ros::Time::now();
+			ros_image.header.seq   = seq++;
+
+
+			ros_image.encoding = "mono8";
+
+			std::cout << bytes << std::endl;
+			memcpy(buf, p_gray_src_img->mp_buffer, bytes);
+
+			/*switch(mode)
 			{
 			case OBJECT_TEACH: // teaching mode
 				teach_template(&in_image, &out_image, &template_image, &or_hnd, ch, &template_roi);
@@ -153,7 +175,7 @@ void readCamera(VRmUsbCamDevice device, VRmDWORD port, VRmImageFormat target_for
 
 			default: std::cout << "Unknown mode!" << std::endl; LogExit();
 
-			}
+			}*/
 
 			// lock the SDL off-screen buffer to output the image to the screen.
 			// The screen_buffer_pitch variable will receive the pitch (byte size of
@@ -182,6 +204,20 @@ void readCamera(VRmUsbCamDevice device, VRmDWORD port, VRmImageFormat target_for
 
 			// and update the screen
 			SDLUpdate();
+
+			int packets = bytes/packet_size;
+			if(bytes%packet_size) packets++;
+			int cnt=0;
+			for(int i=0; i<bytes; i++)
+			{
+				ros_image.data[cnt] = i % 255;
+				if(++cnt==128)
+				{
+					cnt = 0;
+					pub.publish(&ros_image);
+				}
+			}
+			nh.spinOnce();
 		}
 
 		// check keyboard input
@@ -196,8 +232,11 @@ void readCamera(VRmUsbCamDevice device, VRmDWORD port, VRmImageFormat target_for
 	VRMEXECANDCHECK(VRmUsbCamStop(device));
 	VRMEXECANDCHECK(VRmUsbCamFreeImage(&p_gray_src_img));
 	VRMEXECANDCHECK(VRmUsbCamFreeImage(&p_gray_dst_img));
-	if(template_image.st)
-		ip_free_img(&template_image);
+	//if(template_image.st)
+	//	ip_free_img(&template_image);
+
+
+	delete [] ros_image.data;
 
 	// close SDL output window
 	SDLWindowClose();
