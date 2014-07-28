@@ -23,7 +23,8 @@ enum OBJECT_MODE  { OBJECT_TEACH , OBJECT_SEARCH, OBJECT_INSPECT_TEMPLATE};
 #include <std_msgs/String.h>
 #include <sensor_msgs/Image.h>
 
-char *rosSrvrIp = "192.168.1.30";
+//char *rosSrvrIp = "192.168.1.30";
+char *rosSrvrIp = "141.75.114.45";
 
 void readCamera(VRmUsbCamDevice device, VRmDWORD port, VRmImageFormat target_format, VRmRectI src_cropping_region)
 {
