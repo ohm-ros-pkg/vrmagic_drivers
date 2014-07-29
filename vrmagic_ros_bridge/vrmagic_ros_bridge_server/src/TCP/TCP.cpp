@@ -29,7 +29,7 @@ TCP::TCP(unsigned int port)		//server
 	_targetServer = NULL;
 }
 
-TCP::TCP(const char* ip, unsigned int port)		//client
+TCP::TCP(std::string ip, unsigned int port)		//client
 {
 	_choosenMode = client;
 	_port = port;
@@ -49,6 +49,10 @@ TCP::TCP(const char* ip, unsigned int port)		//client
 
 TCP::~TCP()
 {
+    if(!_server)        delete _server;
+    if(!_timer)         delete _timer;
+    if(!_socket)        delete _socket;
+    if(!_targetServer)  delete _targetServer;
 }
 
 int TCP::read(void* data, unsigned int size)

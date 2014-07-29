@@ -1,7 +1,7 @@
 #include <ros/ros.h>
 
 
-#include "VrMagicRosBridge_server.h"
+#include "VrMagicRosBridge_host.h"
 
 int main(int argc, char *argv[])
 {
@@ -9,7 +9,7 @@ int main(int argc, char *argv[])
     ros::NodeHandle nh("~");
 
 
-    VrMagicRosBridge_server node;
+    VrMagicRosBridge_host node;
     node.start(10);
 
 }

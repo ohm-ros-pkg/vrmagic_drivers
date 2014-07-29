@@ -104,6 +104,8 @@ link_directories( ${Boost_LIBRARY_DIR}
 #grab files
 file(GLOB source_files "src/*.cpp"
                        "src/TCP/*.cpp"
+                       "src/VrMagicHandler_roshost/*.cpp"
+                       "../VrMagicHandler/*.cpp"
 					    )
 
 

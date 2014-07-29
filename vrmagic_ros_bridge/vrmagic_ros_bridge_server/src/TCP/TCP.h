@@ -4,7 +4,8 @@
  * @date  : 03.10.2012
  * @author: m1ch1
  *
- * @todo add Enums for returnvalues.... maybe with exeptions also in SerialCom
+ * @todo add Enums for returnvalues.... maybe with exeptions
+ * @todo add std::cerr output on broken connection
  *
  */
 
@@ -51,7 +52,7 @@ private:	//data elements
 
 public:
 	TCP(unsigned int port);						//server
-	TCP(const char* ip, unsigned int port);		//client
+	TCP(std::string ip, unsigned int port);		//client
 	virtual ~TCP();
 
 	int connectOnce();
