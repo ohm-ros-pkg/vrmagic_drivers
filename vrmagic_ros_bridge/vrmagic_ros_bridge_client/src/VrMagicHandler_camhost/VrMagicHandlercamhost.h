@@ -8,14 +8,58 @@
 #ifndef VRMAGICHANDLERCAMHOST_H_
 #define VRMAGICHANDLERCAMHOST_H_
 
+#include "../TCP/TCP.h"
+#include "../../../VrMagicHandler/VrMagicHandler_base.h"
+
 namespace ohm
 {
 
 class VrMagicHandler_camhost
 {
-public:
-    VrMagicHandler_camhost();
+public: //functions
+    /**
+     * @brief Constructor
+     *
+     * @param[in]  port	->	port of tcp-server on the smartcam
+     *
+     */
+    VrMagicHandler_camhost(unsigned int port_smartcam);
+
+    /**
+     * @brief Destructor
+     *
+     */
     virtual ~VrMagicHandler_camhost();
+
+    /**
+     * @brief connects to ros-server-node, this function is blocking
+     *        untill a connection is established
+     *
+     * @param[in,out]  void
+     *
+     * @return 		   void
+     */
+    void connect();
+
+    /**
+     * @brief writes image to ros-server
+     *
+     * @param[in]  image  ->  contains information and a pointer to data from the image
+     *
+     * @return 		   0 on succes and -1 on error
+     */
+    int writeImage(ohm::ImageType& image);
+
+    unsigned int getPort() const;
+
+private: //functions
+
+private: //dataelements
+    unsigned int _port;
+    apps::TCP _tcpServer;
+
+    OHM_HEADER_TYPE* _imgHeader;
+
 };
 
 } /* namespace ohm */

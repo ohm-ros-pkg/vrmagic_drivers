@@ -21,7 +21,9 @@ VrMagicRosBridge_host::VrMagicRosBridge_host() : _rate(0)
 
 VrMagicRosBridge_host::~VrMagicRosBridge_host()
 {
+    delete _smartcamHandler;
     delete _rate;
+    //todo delete msg objs...
 }
 
 void VrMagicRosBridge_host::start(const unsigned int rate)
@@ -43,20 +45,26 @@ void VrMagicRosBridge_host::run()
 
     while(ros::ok())
     {
-        _smartcamHandler->readImage(_imgSmarcam);
-        unsigned int id = _imgSmarcam.id;
-        if(!this->provePublisherExist(id))
+        if(_smartcamHandler->readImage(_imgSmarcam) == 0)
         {
-            this->addPublisher(id);
+            unsigned int id = _imgSmarcam.id;
+            if(!this->provePublisherExist(id))
+            {
+                this->addPublisher(id);
+            }
+            this->setMsgImage(id);
+
+            _publishers[id].publish(*_msgImgs[id]);
         }
-        this->setMsgImage(id);
-
-       _publishers[id].publish(*_msgImgs[id]);
-
+        else
+        {
+            ROS_ERROR("ERROR WHILE READING LAST IMAGE... now will continue");
+            _rate->sleep();
+        }
         //only publishing
         //ros::spinOnce();
        //todo .... prove if need
-       _rate->sleep();
+       //_rate->sleep();
     }
 }
 

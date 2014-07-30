@@ -69,6 +69,7 @@ public: //functions
      * @return 		   todo
      */
     int readImage(ImageType& image);
+
     const std::string& getIp() const;
     unsigned int getPort() const;
 
@@ -78,6 +79,10 @@ private: //dataelements
     std::string _ip;
     unsigned int _port;
     apps::TCP* _tcpClient;
+
+    OHM_HEADER_TYPE* _imgHeader;
+    OHM_DATA_TYPE* _imgData;
+    unsigned int _currentDataSize;
 };
 
 } /* namespace ohm */
