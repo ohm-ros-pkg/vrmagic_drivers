@@ -8,7 +8,7 @@
 #ifndef VRMAGICHANDLERCAMHOST_H_
 #define VRMAGICHANDLERCAMHOST_H_
 
-#include "../TCP/TCP.h"
+#include "TCP/TCP.h"
 #include "../../../VrMagicHandler/VrMagicHandler_base.h"
 
 namespace ohm
