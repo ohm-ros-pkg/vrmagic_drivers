@@ -5,7 +5,7 @@
  *      Author: m1ch1
  */
 
-#include "VrMagicHandlercamhost.h"
+#include "VrMagicHandler_camhost.h"
 
 namespace ohm
 {
