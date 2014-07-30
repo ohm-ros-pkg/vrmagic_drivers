@@ -1,6 +1,6 @@
 # include Rules file with architecture dependent definitions of 
 # VRMSDK_INSTALL_DIR, CROSS_COMPILE_PREFIX, VRM_INCPATH, VRM_LIBPATH, VRM_LFLAGS, VRM_CFLAGS
-include ../Rules.make
+include ../../Rules.make
 
 CXX      = $(CROSS_COMPILE_PREFIX)g++
 CXXFLAGS = -pipe -O2 -fmessage-length=0 -fPIC -Wno-deprecated -Wall -W -Wno-unused $(VRM_CFLAGS)
