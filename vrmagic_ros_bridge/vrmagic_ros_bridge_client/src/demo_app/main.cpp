@@ -13,7 +13,7 @@
 #include <cstring>
 
 #include <vrmusbcam2.h>
-#include "../VrMagicHandler_camhost/VrMagicHandlercamhost.h"
+#include "../VrMagicHandler_camhost/VrMagicHandler_camhost.h"
 
 int main(int argc, char *argv[])
 {
