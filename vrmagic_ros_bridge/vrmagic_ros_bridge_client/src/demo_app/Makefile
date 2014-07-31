@@ -17,7 +17,9 @@ DEL_FILE = rm -f
 
 ####### Files
 
-OBJECTS = main.o 
+OBJECTS = main.o \
+		  ../VrMagicHandler_camhost/VrMagicHandler_camhost.o \
+		  ../VrMagicHandler_camhost/TCP/TCP.o	  
 
 TARGET   = ros_bridge_demo_app
 

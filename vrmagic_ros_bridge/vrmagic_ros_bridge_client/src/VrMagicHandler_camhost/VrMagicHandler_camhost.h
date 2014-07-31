@@ -56,7 +56,7 @@ private: //functions
 
 private: //dataelements
     unsigned int _port;
-    apps::TCP _tcpServer;
+    apps::TCP* _tcpServer;
 
     OHM_HEADER_TYPE* _imgHeader;
 

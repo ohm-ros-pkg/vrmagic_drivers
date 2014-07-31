@@ -27,7 +27,7 @@ VrMagicHandler_camhost::~VrMagicHandler_camhost()
 
 void VrMagicHandler_camhost::connect()
 {
-    _tcpServer.connectOnce();
+    _tcpServer->connectOnce();
 }
 
 int VrMagicHandler_camhost::writeImage(ohm::ImageType& image)
@@ -43,13 +43,13 @@ int VrMagicHandler_camhost::writeImage(ohm::ImageType& image)
     _imgHeader[ohm::BYTE_PER_PIXEL]   = image.bytePerPixel;
 
     //write img-Header
-    if(_tcpServer.write(_imgHeader,(unsigned int)ohm::HEADER_SIZE * sizeof(OHM_HEADER_TYPE)) != 0)
+    if(_tcpServer->write(_imgHeader,(unsigned int)ohm::HEADER_SIZE * sizeof(OHM_HEADER_TYPE)) != 0)
     {
         return -1;
     }
 
     //write img-data
-    if(_tcpServer.write(image.data, image.dataSize) != 0)
+    if(_tcpServer->write(image.data, image.dataSize) != 0)
     {
         return -1;
     }
