@@ -105,7 +105,7 @@ int main(int argc, char *argv[])
     std::cout << "ExposureTime: " << value << "ms, changeable: "<< (supported ? "true" : "false") << std::endl;
     if(supported)
     {
-        value=20.f;
+        value=10.f;
         // uncomment the following lines to change exposure time to 25ms
         // when camera supports this feature
         VRmUsbCamSetPropertyValueF(device, VRM_PROPID_CAM_EXPOSURE_TIME_F, &value);
@@ -146,8 +146,10 @@ int main(int argc, char *argv[])
     << " width " << p_target_img->m_image_format.m_width
     << " heigt "  << p_target_img->m_image_format.m_height
     << " modifier "    << p_target_img->m_image_format.m_image_modifier << std::endl;
-
+    
+    p_target_img->m_pitch = 3 * p_target_img->m_image_format.m_width;
     std::cout << "target img pitch: " << p_target_img->m_pitch << std::endl;
+
 //===================================================================================================================
     //set rosimage
     _rosImage.id                = port;
@@ -181,6 +183,7 @@ int main(int argc, char *argv[])
             break;
         }
 
+		std::cout << "pitch of srcImg: " << p_source_img->m_pitch << std::endl;
         std::cout << "succesfully grabed and converted image" << std::endl;
         //-- work on image --
 
