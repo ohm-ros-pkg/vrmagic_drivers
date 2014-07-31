@@ -47,14 +47,19 @@ void VrMagicRosBridge_host::run()
     {
         if(_smartcamHandler->readImage(_imgSmarcam) == 0)
         {
+            ROS_INFO("Read image");
             unsigned int id = _imgSmarcam.id;
+            ROS_INFO("Read image id: %d",id);
             if(!this->provePublisherExist(id))
             {
+                ROS_INFO("Added Publischer with id: %d", id);
                 this->addPublisher(id);
             }
+            ROS_INFO("Fill msg");
             this->setMsgImage(id);
-
+            ROS_INFO("Publish msg");
             _publishers[id].publish(*_msgImgs[id]);
+            ROS_INFO("Published... rdy");
         }
         else
         {
@@ -101,18 +106,17 @@ int VrMagicRosBridge_host::removePublischer(unsigned int id)
 
 bool VrMagicRosBridge_host::provePublisherExist(unsigned int id)
 {
-    try
+    //prof if key exists
+    if(_publishers.count(id) > 0)
     {
-        _publishers[id];
-    } catch(std::out_of_range& e)
-    {
-        return false;
+        return true;
     }
-    return true;
+    return false;
 }
 
 void VrMagicRosBridge_host::setMsgImage(unsigned int id)
 {
+    //set ROS-Time and seq counter
     _msgImgs[id]->header.stamp = ros::Time::now();
     _msgImgs[id]->header.seq   = _seq[id]++;
 
@@ -123,12 +127,11 @@ void VrMagicRosBridge_host::setMsgImage(unsigned int id)
         _msgImgs[id]->height == _imgSmarcam.height &&
         _msgImgs[id]->step == _imgSmarcam.channels)
     {
-        //set ROS-Time and seq counter
-
         //copy new image in ros-msg
         memcpy(&_msgImgs[id]->data[0],_imgSmarcam.data,_imgSmarcam.dataSize);
         return;
     }
+
 
     //further code is executed if the image dimensions chaged.
 
@@ -178,7 +181,10 @@ void VrMagicRosBridge_host::setMsgImage(unsigned int id)
         ROS_ERROR("FALSE ENCODING GIVEN: %d channel, %d Byte per Pixel... will set to RGB8", _imgSmarcam.channels, _imgSmarcam.bytePerPixel);
         _msgImgs[id]->encoding = sensor_msgs::image_encodings::RGB8;
     }
+    ROS_INFO("resize data to: %d",_imgSmarcam.width * _imgSmarcam.height * _imgSmarcam.bytePerPixel);
     _msgImgs[id]->data.resize(_imgSmarcam.width * _imgSmarcam.height * _imgSmarcam.bytePerPixel);
     //copy image in ros-msg
+    ROS_INFO("Copy data size: %d", _imgSmarcam.dataSize);
     memcpy(&_msgImgs[id]->data[0],_imgSmarcam.data,_imgSmarcam.dataSize);
+    ROS_INFO("Copy data rdy");
 }

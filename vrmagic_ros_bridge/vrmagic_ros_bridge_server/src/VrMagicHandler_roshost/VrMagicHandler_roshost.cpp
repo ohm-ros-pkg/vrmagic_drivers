@@ -63,8 +63,8 @@ int ohm::VrMagicHandler_roshost::readImage(ImageType& image)
     //set data in ImageType image
     image.id                = _imgHeader[ohm::ID];
     image.dataSize          = _imgHeader[ohm::DATA_SIZE];
-    image.dataType          = _imgHeader[ohm::DATA_TYPE];
-    image.compressionType   = _imgHeader[ohm::COMPRESSION_TYPE];
+    image.dataType          = (ohm::Data)_imgHeader[ohm::DATA_TYPE];
+    image.compressionType   = (ohm::Compression)_imgHeader[ohm::COMPRESSION_TYPE];
     image.width             = _imgHeader[ohm::WIDTH];
     image.height            = _imgHeader[ohm::HEIGHT];
     image.channels          = _imgHeader[ohm::CHANNELS];
