@@ -183,7 +183,7 @@ int main(int argc, char *argv[])
 //===================================================================================================================
 
     //start thread for waiting:
-    boost::thread _thread(thread, _rosBrige);
+    boost::thread _thread(thread, &_rosBrige);
 
     bool err_loop = false;
     //source img

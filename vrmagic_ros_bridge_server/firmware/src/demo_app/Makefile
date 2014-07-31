@@ -12,7 +12,7 @@ LIBPATH  = $(VRM_LIBPATH)
 # add additional linker flags as needed 
 LFLAGS= $(VRM_LFLAGS)
 
-LIBS     = -lvrmusbcam2 -lSDL -lpthread  -lboost_system
+LIBS     = -lvrmusbcam2 -lSDL -lpthread  -lboost_system -lboost_thread
 DEL_FILE = rm -f
 
 ####### Files
