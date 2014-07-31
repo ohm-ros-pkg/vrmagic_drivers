@@ -15,8 +15,14 @@
 #include <vrmusbcam2.h>
 #include "../VrMagicHandler_camhost/VrMagicHandler_camhost.h"
 
+#define PORT    1234
+
 int main(int argc, char *argv[])
 {
+//===================================================================================================================
+    ohm::VrMagicHandler_camhost _rosBrige(PORT);
+    ohm::ImageType _rosImage;
+//===================================================================================================================
     // at first, be sure to call VRmUsbCamCleanup() at exit, even in case
     // of an error
     atexit(VRmUsbCamCleanup);
@@ -56,6 +62,9 @@ int main(int argc, char *argv[])
     }
 
     std::cout << "Open deivce succesful" << std::endl;
+
+
+
 
     //init camera
     VRmImageFormat target_format;
@@ -116,6 +125,14 @@ int main(int argc, char *argv[])
         }
     }
 
+//===================================================================================================================
+    std::cout << "------------------------------------------------------------" << std::endl;
+    std::cout << "--- Waiting for ROS-HOST... --------------------------------" << std::endl;
+    std::cout << "------------------------------------------------------------" << std::endl;
+    _rosBrige.connect();
+    std::cout << "Connected to ROS-HOST" << std::endl;
+//===================================================================================================================
+
 
     //start grab
     VRmUsbCamResetFrameCounter(device);
@@ -131,7 +148,18 @@ int main(int argc, char *argv[])
     << " modifier "    << p_target_img->m_image_format.m_image_modifier << std::endl;
 
     std::cout << "target img pitch: " << p_target_img->m_pitch << std::endl;
-
+//===================================================================================================================
+    //set rosimage
+    _rosImage.id                = port;
+    _rosImage.dataSize          = p_target_img->m_pitch * p_target_img->m_image_format.m_height;    //pitch: linelength in byte
+    _rosImage.dataType          = ohm::ImageType;
+    _rosImage.compressionType   = ohm::NONE;
+    _rosImage.width             = p_target_img->m_image_format.m_width;
+    _rosImage.height            = p_target_img->m_image_format.m_height;
+    _rosImage.channels          = 3;
+    _rosImage.bytePerPixel      = 3;
+    _rosImage.data = NULL;
+//===================================================================================================================
     bool err_loop = false;
     VRmImage* p_source_img = 0;
     while(!err_loop)
@@ -159,7 +187,10 @@ int main(int argc, char *argv[])
 
         //-- end work on image --
         //-- transmitt to ros --
-
+//===================================================================================================================
+        _rosImage.data = p_target_img->mp_buffer;
+        _rosBrige.writeImage(_rosImage);
+//===================================================================================================================
         // -- end trasmitt to ros --
 
         if(!VRmUsbCamUnlockNextImage(device,&p_source_img))

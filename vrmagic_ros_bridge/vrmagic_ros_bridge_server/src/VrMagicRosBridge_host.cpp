@@ -152,13 +152,13 @@ void VrMagicRosBridge_host::setMsgImage(unsigned int id)
     else if(_imgSmarcam.channels == 3)
     {
         if(_imgSmarcam.bytePerPixel == 3)
-            _msgImgs[id]->encoding = sensor_msgs::image_encodings::RGB8;
+            _msgImgs[id]->encoding = sensor_msgs::image_encodings::BGR8;
         else if(_imgSmarcam.bytePerPixel == 6)
-            _msgImgs[id]->encoding = sensor_msgs::image_encodings::RGB16;
+            _msgImgs[id]->encoding = sensor_msgs::image_encodings::BGR16;
         else
         {
-            ROS_ERROR("FALSE ENCODING GIVEN at 3 channel... will set to RGB8");
-            _msgImgs[id]->encoding = sensor_msgs::image_encodings::RGB8;
+            ROS_ERROR("FALSE ENCODING GIVEN at 3 channel... will set to BGR8");
+            _msgImgs[id]->encoding = sensor_msgs::image_encodings::BGR8;
         }
     }
     else if(_imgSmarcam.channels == 4)
