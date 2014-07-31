@@ -11,11 +11,26 @@
 #include <iostream>
 #include <cstdlib>
 #include <cstring>
+#include <boost/thread.hpp>
 
 #include <vrmusbcam2.h>
 #include "../VrMagicHandler_camhost/VrMagicHandler_camhost.h"
 
 #define PORT    1234
+
+bool IMAGE_REQUEST = false;
+boost::mutex mutex;
+
+void thread(ohm::VrMagicHandler_camhost* rosBrige)
+{
+    while(1)
+    {
+        rosBrige->wait();
+        mutex.lock();
+        IMAGE_REQUEST = true;
+        mutex.unlock();
+    }
+}
 
 int main(int argc, char *argv[])
 {
@@ -166,15 +181,16 @@ int main(int argc, char *argv[])
 
 
 //===================================================================================================================
+
+    //start thread for waiting:
+    boost::thread _thread(thread, _rosBrige);
+
     bool err_loop = false;
     //source img
     VRmImage* p_source_img = 0;
+
     while(!err_loop)
     {
-//===================================================================================================================
-        //wait for trigger signal from rosHost; maybe do this in a thread
-        _rosBrige.wait();
-//===================================================================================================================
         VRmDWORD frames_dropped;
         if(!VRmUsbCamLockNextImageEx(device,port,&p_source_img,&frames_dropped))
         {
@@ -183,36 +199,41 @@ int main(int argc, char *argv[])
             break;
         }
 
-        if(!VRmUsbCamConvertImage(p_source_img,p_target_img))
+        mutex.lock();
+        if(IMAGE_REQUEST)
         {
-            std::cerr << "Error at converting image: " << VRmUsbCamGetLastError()  << std::endl;
-            err_loop = true;
-            break;
-        }
-
-		std::cout << "pitch of srcImg: " << p_source_img->m_pitch << std::endl;
-        std::cout << "succesfully grabed and converted image" << std::endl;
-        //-- work on image --
-
-
-        //-- end work on image --
-        //-- transmitt to ros --
-//===================================================================================================================
-        //copy data to _rosImgBuffer:
-        for(unsigned int y = 0; y < _rosImage.height; y++)
-        {
-            for(unsigned int x = 0; x < _rosImage.width * 3; x++)
+            IMAGE_REQUEST = false;
+            if(!VRmUsbCamConvertImage(p_source_img,p_target_img))
             {
-                _rosImgBuffer[y*_rosImage.width*3 + x] = p_target_img->mp_buffer[(y*_rosImage.width*3+2) + x];
+                std::cerr << "Error at converting image: " << VRmUsbCamGetLastError()  << std::endl;
+                err_loop = true;
+                break;
             }
-        }
 
-        _rosImage.data = _rosImgBuffer;
-        std::cout << "ImageSize: " << _rosImage.dataSize << std::endl;
-        _rosBrige.writeImage(_rosImage);
+            std::cout << "pitch of srcImg: " << p_source_img->m_pitch << std::endl;
+            std::cout << "succesfully grabed and converted image" << std::endl;
+            //-- work on image --
+
+
+            //-- end work on image --
+            //-- transmitt to ros --
 //===================================================================================================================
-        // -- end trasmitt to ros --
+            //copy data to _rosImgBuffer:
+            for(unsigned int y = 0; y < _rosImage.height; y++)
+            {
+                for(unsigned int x = 0; x < _rosImage.width * 3; x++)
+                {
+                    _rosImgBuffer[y*_rosImage.width*3 + x] = p_target_img->mp_buffer[(y*_rosImage.width*3+2) + x];
+                }
+            }
 
+            _rosImage.data = _rosImgBuffer;
+            std::cout << "ImageSize: " << _rosImage.dataSize << std::endl;
+            _rosBrige.writeImage(_rosImage);
+//===================================================================================================================
+            // -- end trasmitt to ros --
+        }
+        mutex.unlock();
         if(!VRmUsbCamUnlockNextImage(device,&p_source_img))
         {
             std::cerr << "Error at unlocking next image" << std::endl;
@@ -237,6 +258,6 @@ int main(int argc, char *argv[])
     VRmUsbCamStop(device);
     //close device
     VRmUsbCamCloseDevice(device);
-
+    _thread.join();
     return 0;
 }
