@@ -125,7 +125,7 @@ void VrMagicRosBridge_host::setMsgImage(unsigned int id)
      */
     if( _msgImgs[id]->width == _imgSmarcam.width &&
         _msgImgs[id]->height == _imgSmarcam.height &&
-        _msgImgs[id]->step == _imgSmarcam.channels)
+        _msgImgs[id]->step == _imgSmarcam.bytePerPixel * _imgSmarcam.width)
     {
         //copy new image in ros-msg
         memcpy(&_msgImgs[id]->data[0],_imgSmarcam.data,_imgSmarcam.dataSize);

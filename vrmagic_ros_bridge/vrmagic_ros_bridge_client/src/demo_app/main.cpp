@@ -147,7 +147,7 @@ int main(int argc, char *argv[])
     << " heigt "  << p_target_img->m_image_format.m_height
     << " modifier "    << p_target_img->m_image_format.m_image_modifier << std::endl;
     
-    p_target_img->m_pitch = 3 * p_target_img->m_image_format.m_width;
+    //p_target_img->m_pitch = 3 * p_target_img->m_image_format.m_width;
     std::cout << "target img pitch: " << p_target_img->m_pitch << std::endl;
 
 //===================================================================================================================
