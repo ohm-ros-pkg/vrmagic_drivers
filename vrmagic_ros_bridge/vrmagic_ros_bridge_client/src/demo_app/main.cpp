@@ -200,7 +200,7 @@ int main(int argc, char *argv[])
         {
             for(unsigned int x = 0; x < _rosImage.width * 3; x++)
             {
-                _rosImgBuffer[y*_rosImage.width + x] = p_target_img->mp_buffer[y*_rosImage.width + x];
+                _rosImgBuffer[y*_rosImage.width*3 + x] = p_target_img->mp_buffer[(y*_rosImage.width*3+2) + x];
             }
         }
 
