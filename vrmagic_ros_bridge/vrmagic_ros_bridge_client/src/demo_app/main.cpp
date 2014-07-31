@@ -152,7 +152,7 @@ int main(int argc, char *argv[])
     //set rosimage
     _rosImage.id                = port;
     _rosImage.dataSize          = p_target_img->m_pitch * p_target_img->m_image_format.m_height;    //pitch: linelength in byte
-    _rosImage.dataType          = ohm::ImageType;
+    _rosImage.dataType          = ohm::IMAGE;
     _rosImage.compressionType   = ohm::NONE;
     _rosImage.width             = p_target_img->m_image_format.m_width;
     _rosImage.height            = p_target_img->m_image_format.m_height;
