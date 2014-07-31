@@ -137,7 +137,7 @@ void VrMagicRosBridge_host::setMsgImage(unsigned int id)
 
     _msgImgs[id]->width = _imgSmarcam.width;
     _msgImgs[id]->height = _imgSmarcam.height;
-    _msgImgs[id]->step = _imgSmarcam.channels;
+    _msgImgs[id]->step = _imgSmarcam.bytePerPixel * _imgSmarcam.width;
     _msgImgs[id]->is_bigendian = 0;
 
     if(_imgSmarcam.channels == 1)
@@ -181,6 +181,9 @@ void VrMagicRosBridge_host::setMsgImage(unsigned int id)
         ROS_ERROR("FALSE ENCODING GIVEN: %d channel, %d Byte per Pixel... will set to RGB8", _imgSmarcam.channels, _imgSmarcam.bytePerPixel);
         _msgImgs[id]->encoding = sensor_msgs::image_encodings::RGB8;
     }
+
+    ROS_INFO("selected Encoding: %s", _msgImgs[id]->encoding.c_str());
+
     ROS_INFO("resize data to: %d",_imgSmarcam.width * _imgSmarcam.height * _imgSmarcam.bytePerPixel);
     _msgImgs[id]->data.resize(_imgSmarcam.width * _imgSmarcam.height * _imgSmarcam.bytePerPixel);
     //copy image in ros-msg
