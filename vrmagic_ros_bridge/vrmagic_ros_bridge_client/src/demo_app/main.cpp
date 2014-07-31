@@ -161,6 +161,10 @@ int main(int argc, char *argv[])
     _rosImage.channels          = 3;
     _rosImage.bytePerPixel      = 3;
     _rosImage.data = NULL;
+
+    OHM_DATA_TYPE* _rosImgBuffer = new OHM_DATA_TYPE[_rosImage.dataSize];
+
+
 //===================================================================================================================
     bool err_loop = false;
     VRmImage* p_source_img = 0;
@@ -191,7 +195,16 @@ int main(int argc, char *argv[])
         //-- end work on image --
         //-- transmitt to ros --
 //===================================================================================================================
-        _rosImage.data = p_target_img->mp_buffer;
+        //copy data to _rosImgBuffer:
+        for(unsigned int y = 0; y < _rosImage.height; y++)
+        {
+            for(unsigned int x = 0; x < _rosImage.width * 3; x++)
+            {
+                _rosImgBuffer[y*_rosImage.width + x] = p_target_img->mp_buffer[y*_rosImage.width + x];
+            }
+        }
+
+        _rosImage.data = _rosImgBuffer;
         std::cout << "ImageSize: " << _rosImage.dataSize << std::endl;
         _rosBrige.writeImage(_rosImage);
 //===================================================================================================================
