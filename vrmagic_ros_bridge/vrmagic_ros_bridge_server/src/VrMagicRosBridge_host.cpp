@@ -45,26 +45,30 @@ void VrMagicRosBridge_host::run()
 
     while(ros::ok())
     {
-        if(_smartcamHandler->readImage(_imgSmarcam) == 0)
+        //trigger smartcam
+        if(_smartcamHandler->triggerImage() == 0)
         {
-            ROS_INFO("Read image");
-            unsigned int id = _imgSmarcam.id;
-            ROS_INFO("Read image id: %d",id);
-            if(!this->provePublisherExist(id))
+            if(_smartcamHandler->readImage(_imgSmarcam) == 0)
             {
-                ROS_INFO("Added Publischer with id: %d", id);
-                this->addPublisher(id);
+                ROS_INFO("Read image");
+                unsigned int id = _imgSmarcam.id;
+                ROS_INFO("Read image id: %d",id);
+                if(!this->provePublisherExist(id))
+                {
+                    ROS_INFO("Added Publischer with id: %d", id);
+                    this->addPublisher(id);
+                }
+                ROS_INFO("Fill msg");
+                this->setMsgImage(id);
+                ROS_INFO("Publish msg");
+                _publishers[id].publish(*_msgImgs[id]);
+                ROS_INFO("Published... rdy");
             }
-            ROS_INFO("Fill msg");
-            this->setMsgImage(id);
-            ROS_INFO("Publish msg");
-            _publishers[id].publish(*_msgImgs[id]);
-            ROS_INFO("Published... rdy");
-        }
-        else
-        {
-            ROS_ERROR("ERROR WHILE READING LAST IMAGE... now will continue");
-            _rate->sleep();
+            else
+            {
+                ROS_ERROR("ERROR WHILE READING LAST IMAGE... now will continue");
+                _rate->sleep();
+            }
         }
         //only publishing
         //ros::spinOnce();

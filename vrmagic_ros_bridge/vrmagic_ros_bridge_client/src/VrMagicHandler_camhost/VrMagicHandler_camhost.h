@@ -50,6 +50,15 @@ public: //functions
      */
     int writeImage(ohm::ImageType& image);
 
+    /**
+     * @brief waits for an imagerequest from ros
+     *
+     * @param[in,out]  void
+     *
+     * @return 		   0 on succes -1 on connection error and -2 if trigger is not an image request
+     */
+    int wait();
+
     unsigned int getPort() const;
 
 private: //functions

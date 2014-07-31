@@ -70,6 +70,15 @@ public: //functions
      */
     int readImage(ImageType& image);
 
+    /**
+     * @brief triggers vrmagic scmartcam for next image
+     *
+     * @param[in,out]  void
+     *
+     * @return 		   0 on succes -1 on connection error
+     */
+    int triggerImage();
+
     const std::string& getIp() const;
     unsigned int getPort() const;
 

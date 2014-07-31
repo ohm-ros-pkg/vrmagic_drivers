@@ -24,6 +24,7 @@
 
 #define OHM_DATA_TYPE       uint8_t
 #define OHM_HEADER_TYPE     uint32_t
+#define OHM_TRIGGER_TYPE    uint32_t
 #define OHM_CONFIG_TYPE     uint32_t
 //todo more stuff for header config if needed
 
@@ -49,6 +50,9 @@ enum Data{ IMAGE = 0,
 enum Compression{ NONE = 0,
                   TODO
                    };
+
+enum Trigger{ IMAGE_REQUEST = 0
+               };
 
 
 

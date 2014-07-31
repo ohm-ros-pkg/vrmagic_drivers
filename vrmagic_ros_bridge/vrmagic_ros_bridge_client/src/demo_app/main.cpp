@@ -167,11 +167,14 @@ int main(int argc, char *argv[])
 
 //===================================================================================================================
     bool err_loop = false;
+    //source img
     VRmImage* p_source_img = 0;
     while(!err_loop)
     {
-        //source img
-
+//===================================================================================================================
+        //wait for trigger signal from rosHost; maybe do this in a thread
+        _rosBrige.wait();
+//===================================================================================================================
         VRmDWORD frames_dropped;
         if(!VRmUsbCamLockNextImageEx(device,port,&p_source_img,&frames_dropped))
         {
