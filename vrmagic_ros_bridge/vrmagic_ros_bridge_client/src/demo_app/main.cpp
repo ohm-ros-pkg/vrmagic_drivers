@@ -189,6 +189,7 @@ int main(int argc, char *argv[])
         //-- transmitt to ros --
 //===================================================================================================================
         _rosImage.data = p_target_img->mp_buffer;
+        std::cout << "ImageSize: " << _rosImage.dataSize << std::endl;
         _rosBrige.writeImage(_rosImage);
 //===================================================================================================================
         // -- end trasmitt to ros --
