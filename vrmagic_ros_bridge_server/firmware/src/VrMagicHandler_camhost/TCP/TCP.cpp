@@ -173,6 +173,7 @@ int TCP::write(void* data, unsigned int size)
     catch(boost::system::system_error& e)
     {
         //get new connection
+        //debug
         std::cerr << "Got Boost sytem Error while transmitting" << std::endl;
         this->connectOnce();
         return -1;
