@@ -12,7 +12,7 @@ VrMagicRosBridge_host::VrMagicRosBridge_host() : _rate(0)
     int port_smartcam;
 
     privNh.param("pub_name",pub_name,std::string("vrmagic_image"));
-    privNh.param("ip_smartcam",ip_smartcam,std::string("192.168.3.100"));
+    privNh.param("ip_smartcam",ip_smartcam,std::string("192.168.3.101"));
     privNh.param<int>("port_smartcam",port_smartcam, 1234);
 
     _pubName_base = pub_name;

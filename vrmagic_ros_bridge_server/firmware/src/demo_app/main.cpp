@@ -27,7 +27,10 @@ void thread(ohm::VrMagicHandler_camhost* rosBrige)
     while(1)
     {
         mutex_rosBuffer_1.lock();
-        rosBrige->writeImage(_rosImage);
+        if(rosBrige->writeImage(_rosImage) != 0)
+        {
+            std::cerr << "ERROR AT WRITING IMAGE TO ROS_SERVER" << std::endl;
+        }
         mutex_rosBuffer_1.unlock();
     }
 }
