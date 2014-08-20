@@ -77,7 +77,7 @@ public: //functions
      *
      * @return 		   0 on succes -1 on connection error
      */
-    int triggerImage();
+//    int triggerImage();
 
     const std::string& getIp() const;
     unsigned int getPort() const;

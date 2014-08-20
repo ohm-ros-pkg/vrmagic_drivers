@@ -18,17 +18,17 @@
 
 #define PORT    1234
 
-bool IMAGE_REQUEST = false;
-boost::mutex mutex;
+//bool IMAGE_REQUEST = false;
+boost::mutex mutex_rosBuffer_1;
+ohm::ImageType _rosImage;
 
 void thread(ohm::VrMagicHandler_camhost* rosBrige)
 {
     while(1)
     {
-        rosBrige->wait();
-        mutex.lock();
-        IMAGE_REQUEST = true;
-        mutex.unlock();
+        mutex_rosBuffer_1.lock();
+        rosBrige->writeImage(_rosImage);
+        mutex_rosBuffer_1.unlock();
     }
 }
 
@@ -36,7 +36,7 @@ int main(int argc, char *argv[])
 {
 //===================================================================================================================
     ohm::VrMagicHandler_camhost _rosBrige(PORT);
-    ohm::ImageType _rosImage;
+
 //===================================================================================================================
     // at first, be sure to call VRmUsbCamCleanup() at exit, even in case
     // of an error
@@ -55,7 +55,7 @@ int main(int argc, char *argv[])
     if(size != 1)
     {
         std::cout << "found more or none devie..." << std::endl;
-        std::cout << "this programm ist just for hanlde with one device pleace change code..." << std::endl;
+        std::cout << "this programm ist just for hanlde with one device please change code..." << std::endl;
         std::cout << "will exit now...." << std::endl;
         exit(EXIT_FAILURE);
     }
@@ -199,25 +199,25 @@ int main(int argc, char *argv[])
             break;
         }
 
-        mutex.lock();
-        if(IMAGE_REQUEST)
+
+        if(!VRmUsbCamConvertImage(p_source_img,p_target_img))
         {
-            IMAGE_REQUEST = false;
-            if(!VRmUsbCamConvertImage(p_source_img,p_target_img))
-            {
-                std::cerr << "Error at converting image: " << VRmUsbCamGetLastError()  << std::endl;
-                err_loop = true;
-                break;
-            }
+            std::cerr << "Error at converting image: " << VRmUsbCamGetLastError()  << std::endl;
+            err_loop = true;
+            break;
+        }
 
-            std::cout << "pitch of srcImg: " << p_source_img->m_pitch << std::endl;
-            std::cout << "succesfully grabed and converted image" << std::endl;
-            //-- work on image --
+        std::cout << "pitch of srcImg: " << p_source_img->m_pitch << std::endl;
+        std::cout << "succesfully grabed and converted image" << std::endl;
+        //-- work on image --
 
 
-            //-- end work on image --
-            //-- transmitt to ros --
+        //-- end work on image --
+        //-- transmitt to ros --
 //===================================================================================================================
+        if(mutex_rosBuffer_1.try_lock())
+        {
+
             //copy data to _rosImgBuffer:
             for(unsigned int y = 0; y < _rosImage.height; y++)
             {
@@ -226,14 +226,14 @@ int main(int argc, char *argv[])
                     _rosImgBuffer[y*_rosImage.width*3 + x] = p_target_img->mp_buffer[y*p_target_img->m_pitch + x];
                 }
             }
-
             _rosImage.data = _rosImgBuffer;
+            mutex_rosBuffer_1.unlock();
             std::cout << "ImageSize: " << _rosImage.dataSize << std::endl;
-            _rosBrige.writeImage(_rosImage);
-//===================================================================================================================
-            // -- end trasmitt to ros --
+
         }
-        mutex.unlock();
+//===================================================================================================================
+        // -- end trasmitt to ros --
+
         if(!VRmUsbCamUnlockNextImage(device,&p_source_img))
         {
             std::cerr << "Error at unlocking next image" << std::endl;

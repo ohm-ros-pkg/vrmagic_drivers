@@ -57,19 +57,19 @@ int VrMagicHandler_camhost::writeImage(ohm::ImageType& image)
     return 0;
 }
 
-int VrMagicHandler_camhost::wait()
-{
-    OHM_TRIGGER_TYPE trigger;
-    if(_tcpServer->readAll(&trigger, sizeof(OHM_TRIGGER_TYPE)) != 0)
-    {
-        return -1;
-    }
-    if(!trigger == ohm::IMAGE_REQUEST)
-    {
-        return -2;
-    }
-    return 0;
-}
+//int VrMagicHandler_camhost::wait()
+//{
+//    OHM_TRIGGER_TYPE trigger;
+//    if(_tcpServer->readAll(&trigger, sizeof(OHM_TRIGGER_TYPE)) != 0)
+//    {
+//        return -1;
+//    }
+//    if(!trigger == ohm::IMAGE_REQUEST)
+//    {
+//        return -2;
+//    }
+//    return 0;
+//}
 
 unsigned int VrMagicHandler_camhost::getPort() const
 {

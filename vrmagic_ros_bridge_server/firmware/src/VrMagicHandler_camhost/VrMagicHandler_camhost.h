@@ -57,7 +57,7 @@ public: //functions
      *
      * @return 		   0 on succes -1 on connection error and -2 if trigger is not an image request
      */
-    int wait();
+    //int wait();
 
     unsigned int getPort() const;
 

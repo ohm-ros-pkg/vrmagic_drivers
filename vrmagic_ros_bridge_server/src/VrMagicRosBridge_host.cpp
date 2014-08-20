@@ -46,7 +46,7 @@ void VrMagicRosBridge_host::run()
     while(ros::ok())
     {
         //trigger smartcam
-        if(_smartcamHandler->triggerImage() == 0)
+        //if(_smartcamHandler->triggerImage() == 0)
         {
             if(_smartcamHandler->readImage(_imgSmarcam) == 0)
             {

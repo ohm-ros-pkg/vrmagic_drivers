@@ -75,15 +75,15 @@ int ohm::VrMagicHandler_roshost::readImage(ImageType& image)
     return 0;
 }
 
-int VrMagicHandler_roshost::triggerImage()
-{
-    OHM_TRIGGER_TYPE trigger = ohm::IMAGE_REQUEST;
-    if(_tcpClient->write(&trigger,sizeof(OHM_TRIGGER_TYPE)) != 0)
-    {
-        return -1;
-    }
-    return 0;
-}
+//int VrMagicHandler_roshost::triggerImage()
+//{
+//    OHM_TRIGGER_TYPE trigger = ohm::IMAGE_REQUEST;
+//    if(_tcpClient->write(&trigger,sizeof(OHM_TRIGGER_TYPE)) != 0)
+//    {
+//        return -1;
+//    }
+//    return 0;
+//}
 
 const std::string& ohm::VrMagicHandler_roshost::getIp() const
 {
