@@ -1,0 +1,10 @@
+<stack>
+	<description brief="vrmagic_drivers">
+		Driver stack for VRMagic smarcams
+	</description>
+	<author>Michael Schmidpeter</author>
+	<license>GPLv2</license>
+	<review status="experiemental" notes=""/>
+	<url>http://ros.org/wiki/vrmagic_drivers</url>
+	<depend stack="ros" />
+</stack>
