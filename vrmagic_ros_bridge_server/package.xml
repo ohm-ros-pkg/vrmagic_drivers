@@ -2,7 +2,14 @@
 <package>
   <name>vrmagic_ros_bridge_server</name>
   <version>0.0.0</version>
-  <description>The vrmagic_ros_bridge_server package</description>
+  <description>
+  	This Package contains a ROS-brige for the VRMagic Smartcameras. There is a
+  	ROS-node(vrmagic_ros_bridge_server) which is the Server vor the ROS-brige and a firmware for the VRMagic
+  	Smartcam. On the Smartcam side the User have to implement a firmware and have
+  	to use the Class VrMagicHandler_camhost for communication with the vrmagic_ros_bridge_server.
+  	Each Image which is transmitted to the vrmagic_ros_bridge_server will be published as Image.
+  	Multiple Images are also posible.
+  </description>
 
   <!-- One maintainer tag required, multiple allowed, one person per tag --> 
   <!-- Example:  -->
@@ -25,7 +32,7 @@
   <!-- Author tags are optional, mutiple are allowed, one per tag -->
   <!-- Authors do not have to be maintianers, but could be -->
   <!-- Example: -->
-  <!-- <author email="jane.doe@example.com">Jane Doe</author> -->
+  <author email="schmidpetermi46820@th-nuernberg.de">Michael Schmidpeter</author>
 
 
   <!-- The *_depend tags are used to specify dependencies -->
