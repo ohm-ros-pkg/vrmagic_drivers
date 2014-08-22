@@ -27,8 +27,10 @@
 #include <vrmusbcam2.h>
 #include "../VrMagicHandler_camhost/VrMagicHandler_camhost.h"
 
-#define PORT    1234
-#define MOD_VAL 4
+#define PORT           1234
+#define MOD_VAL        2
+#define EXPOSURE_TIME  5.f
+
 
 int main(int argc, char *argv[])
 {
@@ -114,7 +116,7 @@ int main(int argc, char *argv[])
     std::cout << "ExposureTime: " << value << "ms, changeable: "<< (supported ? "true" : "false") << std::endl;
     if(supported)
     {
-        value=10.f;
+        value=EXPOSURE_TIME;
         // uncomment the following lines to change exposure time to 25ms
         // when camera supports this feature
         VRmUsbCamSetPropertyValueF(device, VRM_PROPID_CAM_EXPOSURE_TIME_F, &value);
