@@ -11,7 +11,7 @@ VrMagicRosBridge_host::VrMagicRosBridge_host() : _rate(0)
     std::string ip_smartcam;
     int port_smartcam;
 
-    privNh.param("pub_name",pub_name,std::string("vrmagic_image"));
+    privNh.param("pub_name",pub_name,std::string("vrmagic_image_"));
     privNh.param("ip_smartcam",ip_smartcam,std::string("192.168.3.101"));
     privNh.param<int>("port_smartcam",port_smartcam, 1234);
 
@@ -38,7 +38,7 @@ void VrMagicRosBridge_host::run()
 {
 
     //connect to camera
-    ROS_INFO("Waiting for connenction to Smartcam ...");
+    ROS_INFO("Waiting for connenction to Smartcam : IP: %s, PORT: %d",_smartcamHandler->getIp().c_str(),_smartcamHandler->getPort());
     _smartcamHandler->connect();
     ROS_INFO("Connected to Smartcam: IP: %s, PORT: %d",_smartcamHandler->getIp().c_str(),_smartcamHandler->getPort());
 

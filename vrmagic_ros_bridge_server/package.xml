@@ -1,14 +1,14 @@
 <?xml version="1.0"?>
 <package>
   <name>vrmagic_ros_bridge_server</name>
-  <version>0.0.0</version>
+  <version>0.1.0</version>
   <description>
-  	This Package contains a ROS-brige for the VRMagic Smartcameras. There is a
-  	ROS-node(vrmagic_ros_bridge_server) which is the Server vor the ROS-brige and a firmware for the VRMagic
-  	Smartcam. On the Smartcam side the User have to implement a firmware and have
-  	to use the Class VrMagicHandler_camhost for communication with the vrmagic_ros_bridge_server.
-  	Each Image which is transmitted to the vrmagic_ros_bridge_server will be published as Image.
-  	Multiple Images are also posible.
+	This Package contains a ROS-brige for the VRMagic Smartcameras. There is a
+	ROS-node (vrmagic_ros_bridge_server), which is the Server for the ROS-brige,
+  	and firmware for the VRMagic Smartcam. On the Smartcam the User have to implement a firmware and have	
+	to use the Class VrMagicHandler_camhost for communication with the vrmagic_ros_bridge_server.
+	Each Image which is transmitted to the vrmagic_ros_bridge_server by using the Class VrMagicHandler_camhost
+  	will be published as Image via ROS. Multiple Images are also possible.
   </description>
 
   <!-- One maintainer tag required, multiple allowed, one person per tag --> 
