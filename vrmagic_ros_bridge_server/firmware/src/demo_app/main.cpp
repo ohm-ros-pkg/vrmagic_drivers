@@ -1,8 +1,19 @@
-/*
- * main .cpp
+/**
+ *  @file   main.cpp
+ *  @brief  Demo application for VRMagic D3 smartcam to show basic usage of ROS brige interface
  *
- *  Created on: 30.07.2014
- *      Author: m1ch1
+ *  @author	  Michael Schmidpeter
+ *
+ *  @version  1.00
+ *
+ *  @date     22.08.2014
+ *
+ *
+ * History: \n
+ * -----------------
+ *  - Version 1.00:    m1ch1          22.08.2014\n
+ *			- initial Filecreation
+ *
  */
 
 
@@ -17,69 +28,10 @@
 #include "../VrMagicHandler_camhost/VrMagicHandler_camhost.h"
 
 #define PORT    1234
-
-//bool IMAGE_REQUEST = false;
-boost::mutex mutex_rosBuffer_0;
-boost::mutex mutex_rosBuffer_1;
-boost::mutex mutex_usedBuffer;
-ohm::ImageType _rosImage;
-unsigned int g_usedBuffer = 0;
-
-void thread(OHM_DATA_TYPE** data)
-{
-//===================================================================================================================
-    ohm::VrMagicHandler_camhost _rosBrige(PORT);
-
-    std::cout << "------------------------------------------------------------" << std::endl;
-    std::cout << "--- Waiting for ROS-HOST... --------------------------------" << std::endl;
-    std::cout << "------------------------------------------------------------" << std::endl;
-    _rosBrige.connect();
-    std::cout << "Connected to ROS-HOST" << std::endl;
-//===================================================================================================================
-    unsigned int usedBuffer;
-    while(1)
-    {
-        //get currend used Buffer
-        mutex_usedBuffer.lock();
-        usedBuffer = g_usedBuffer;
-        mutex_usedBuffer.unlock();
-
-        if(usedBuffer == 0)
-        {
-            mutex_rosBuffer_0.lock();
-            _rosImage.data = data[0];
-
-
-            if(_rosBrige.writeImage(_rosImage) != 0)
-            {
-                std::cerr << "ERROR AT WRITING IMAGE TO ROS_SERVER" << std::endl;
-            }
-            mutex_rosBuffer_0.unlock();
-        }
-        if(usedBuffer == 1)
-        {
-            mutex_rosBuffer_1.lock();
-            _rosImage.data = data[1];
-
-            if(_rosBrige.writeImage(_rosImage) != 0)
-            {
-                std::cerr << "ERROR AT WRITING IMAGE TO ROS_SERVER" << std::endl;
-            }
-            mutex_rosBuffer_1.unlock();
-        }
-        else
-        {
-            //should never reached
-        }
-    }
-}
+#define MOD_VAL 4
 
 int main(int argc, char *argv[])
 {
-//===================================================================================================================
-
-
-//===================================================================================================================
     // at first, be sure to call VRmUsbCamCleanup() at exit, even in case
     // of an error
     atexit(VRmUsbCamCleanup);
@@ -199,6 +151,16 @@ int main(int argc, char *argv[])
     std::cout << "target img pitch: " << p_target_img->m_pitch << std::endl;
 
 //===================================================================================================================
+    ohm::VrMagicHandler_camhost _rosBrige(PORT);
+    ohm::ImageType _rosImage;
+
+    std::cout << "------------------------------------------------------------" << std::endl;
+    std::cout << "--- Waiting for ROS-HOST... --------------------------------" << std::endl;
+    std::cout << "------------------------------------------------------------" << std::endl;
+    _rosBrige.connect();
+    std::cout << "Connected to ROS-HOST" << std::endl;
+
+
     //set rosimage
     _rosImage.id                = port;
     _rosImage.dataSize          = p_target_img->m_image_format.m_width * 3 * p_target_img->m_image_format.m_height;
@@ -210,21 +172,18 @@ int main(int argc, char *argv[])
     _rosImage.bytePerPixel      = 3;
     _rosImage.data = NULL;
 
-    OHM_DATA_TYPE* _rosImgBuffer[2];
-    _rosImgBuffer[0] = new OHM_DATA_TYPE[_rosImage.dataSize];
-    _rosImgBuffer[1] = new OHM_DATA_TYPE[_rosImage.dataSize];
+    OHM_DATA_TYPE* _rosImgBuffer;
+    _rosImgBuffer = new OHM_DATA_TYPE[_rosImage.dataSize];
 
 
 //===================================================================================================================
 
-    //start thread for waiting:
-    std::cout << "start thread" << std::endl;
-    boost::thread _thread(thread, _rosImgBuffer);
-
     bool err_loop = false;
+    unsigned int cnt = 0;
     //source img
     VRmImage* p_source_img = 0;
 
+    //enter main loop
     while(!err_loop)
     {
         VRmDWORD frames_dropped;
@@ -236,56 +195,34 @@ int main(int argc, char *argv[])
         }
 
 
-        if(!VRmUsbCamConvertImage(p_source_img,p_target_img))
-        {
-            std::cerr << "Error at converting image: " << VRmUsbCamGetLastError()  << std::endl;
-            err_loop = true;
-            break;
-        }
+        if(cnt % MOD_VAL == 0)
+        {//transmitt every MOD_VAL'th image to ensure that the camera grabbuffer is emty
+            if(!VRmUsbCamConvertImage(p_source_img,p_target_img))
+            {
+                std::cerr << "Error at converting image: " << VRmUsbCamGetLastError()  << std::endl;
+                err_loop = true;
+                break;
+            }
 
-        std::cout << "pitch of srcImg: " << p_source_img->m_pitch << std::endl;
-        std::cout << "succesfully grabed and converted image" << std::endl;
-        //-- work on image --
+            //-- work on image --
 
 
-        //-- end work on image --
-        //-- transmitt to ros --
+            //-- end work on image --
+            //-- transmitt to ros --
 //===================================================================================================================
-        if(mutex_rosBuffer_0.try_lock())
-        {//buffer0 free use 0
-            std::cout << "Use Buffer 0" << std::endl;
             //copy data to _rosImgBuffer:
             for(unsigned int y = 0; y < _rosImage.height; y++)
             {
                 for(unsigned int x = 0; x < _rosImage.width * 3; x++)
                 {
-                    _rosImgBuffer[0][y*_rosImage.width*3 + x] = p_target_img->mp_buffer[y*p_target_img->m_pitch + x];
+                    _rosImgBuffer[y*_rosImage.width*3 + x] = p_target_img->mp_buffer[y*p_target_img->m_pitch + x];
                 }
             }
-            mutex_rosBuffer_0.unlock();
-            mutex_usedBuffer.lock();
-            g_usedBuffer = 0;
-            mutex_usedBuffer.unlock();
-        }
-        else if(mutex_rosBuffer_1.try_lock())
-        {//buffer1 free use 1
-            std::cout << "Use Buffer 0" << std::endl;
-            //copy data to _rosImgBuffer:
-            for(unsigned int y = 0; y < _rosImage.height; y++)
-            {
-                for(unsigned int x = 0; x < _rosImage.width * 3; x++)
-                {
-                    _rosImgBuffer[1][y*_rosImage.width*3 + x] = p_target_img->mp_buffer[y*p_target_img->m_pitch + x];
-                }
-            }
-            mutex_rosBuffer_1.unlock();
-            mutex_usedBuffer.lock();
-            g_usedBuffer = 1;
-            mutex_usedBuffer.unlock();
-        }
+            _rosImage.data = _rosImgBuffer;
+            _rosBrige.writeImage(_rosImage);
 //===================================================================================================================
-        // -- end trasmitt to ros --
-
+            // -- end trasmitt to ros --
+        }
         if(!VRmUsbCamUnlockNextImage(device,&p_source_img))
         {
             std::cerr << "Error at unlocking next image" << std::endl;
@@ -298,6 +235,7 @@ int main(int argc, char *argv[])
         {
             std::cout << frames_dropped <<" frame(s) dropped" << std::endl;
         }
+        cnt++;
     }
 
     if(err_loop)
@@ -310,6 +248,5 @@ int main(int argc, char *argv[])
     VRmUsbCamStop(device);
     //close device
     VRmUsbCamCloseDevice(device);
-    _thread.join();
     return 0;
 }
