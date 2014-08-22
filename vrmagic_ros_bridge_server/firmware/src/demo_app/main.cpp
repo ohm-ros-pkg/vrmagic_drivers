@@ -176,8 +176,6 @@ int main(int argc, char *argv[])
 
     OHM_DATA_TYPE* _rosImgBuffer;
     _rosImgBuffer = new OHM_DATA_TYPE[_rosImage.dataSize];
-
-
 //===================================================================================================================
 
     bool err_loop = false;

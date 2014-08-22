@@ -38,15 +38,11 @@ void ohm::VrMagicHandler_roshost::connect()
 
 int ohm::VrMagicHandler_roshost::readImage(ImageType& image)
 {
-    //debug
-    std::cout << "debug: read Header:" << std::endl;
     //read Header
     if(_tcpClient->readAll(_imgHeader, (unsigned int)ohm::HEADER_SIZE * sizeof(OHM_HEADER_TYPE)) != 0)
     {
         return -1;
     }
-    //debug
-     std::cout << "debug: Header read" << std::endl;
     unsigned int dataSize = _imgHeader[ohm::DATA_SIZE];
 
     //prove and allocate databuffer if needed
@@ -59,14 +55,10 @@ int ohm::VrMagicHandler_roshost::readImage(ImageType& image)
     }
 
     //read image data
-    //debug
-    std::cout << "debug: read Data" << std::endl;
     if(_tcpClient->readAll(_imgData, dataSize) != 0)
     {
         return -1;
     }
-    //debug
-    std::cout << "debug: Data read" << std::endl;
 
     //set data in ImageType image
     image.id                = _imgHeader[ohm::ID];
